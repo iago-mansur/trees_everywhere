@@ -1,0 +1,6 @@
+_____________
+Project Setup
+
+git checkout -b development
+sudo chmod 666 /var/run/docker.sock
+docker build .
