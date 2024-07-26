@@ -5,3 +5,13 @@ git checkout -b development
 sudo chmod 666 /var/run/docker.sock
 docker build .
 docker-compose build
+
+______
+Django
+
+docker-compose run --rm app sh -c "django-admin startproject trees_everywhere_app ."
+docker-compose up
+
+Web Browser: 
+    http://127.0.0.1:8000/
+    Ctrl+c
