@@ -12,6 +12,8 @@ Django
 docker-compose run --rm app sh -c "django-admin startproject trees_everywhere_app ."
 docker-compose up
 
-Web Browser: 
+Web Browser:
     http://127.0.0.1:8000/
     Ctrl+c
+
+docker-compose run --rm app sh -c "django-admin startapp core"
