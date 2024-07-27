@@ -25,3 +25,33 @@ docker-compose up
 docker-compose run --rm app sh -c "python manage.py createsuperuser"
     Email: admin@example.com
     Password: admin123
+Web Browser:
+    http://127.0.0.1:8000/admin/
+    Ctrl+c
+docker-compose down
+
+
+
+sudo chmod 666 /var/run/docker.sock
+docker build .
+docker-compose build
+docker-compose run --rm app sh -c "python manage.py test"
+docker-compose up
+
+
+
+
+
+
+-----------------------------------------------------------------------------------------------------------
+Remove container and volume
+
+docker ps
+docker stop trees_everywhere_app_1
+docker rm trees_everywhere_app_1
+docker volume ls
+docker volume rm <volume_name> or docker volume prune or docker volume ls -q | xargs docker volume rm
+
+or
+docker-compose down -v
+-----------------------------------------------------------------------------------------------------------
