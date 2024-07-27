@@ -40,6 +40,12 @@ docker-compose up
 
 
 
+docker-compose build
+Web Browser:
+    http://127.0.0.1:8000/api/docs/
+
+
+
 
 
 
@@ -54,4 +60,12 @@ docker volume rm <volume_name> or docker volume prune or docker volume ls -q | x
 
 or
 docker-compose down -v
+
+docker ps -a
+docker stop $(docker ps -q)
+docker ps -q | xargs -r docker stop
+docker rm $(docker ps -a -q) or docker ps -q | xargs -r docker stop && docker ps -a -q | xargs -r docker rm
+
+docker images
+docker system prune -a
 -----------------------------------------------------------------------------------------------------------
