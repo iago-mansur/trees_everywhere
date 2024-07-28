@@ -11,9 +11,18 @@ from core import models
 class UserAdmin(BaseUserAdmin):
     """Define the admin pages for users."""
     ordering = ['id']
-    list_display = ['email', 'name']
+    list_display = ['email', 'name', 'primary_account']
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
+        (
+            _('Personal info'),
+            {
+                'fields': (
+                    'name',
+                    'primary_account',  # Added 'primary_account'
+                ),
+            }
+        ),
         (
             _('Permissions'),
             {
@@ -35,6 +44,7 @@ class UserAdmin(BaseUserAdmin):
                 'password1',
                 'password2',
                 'name',
+                'primary_account',
                 'is_active',
                 'is_staff',
                 'is_superuser',
@@ -42,4 +52,11 @@ class UserAdmin(BaseUserAdmin):
         }),
     )
 
+
+class PrimaryAccountAdmin(admin.ModelAdmin):
+    """Define the admin pages for primary accounts."""
+    list_display = ['name']
+    search_fields = ['name']
+
 admin.site.register(models.User, UserAdmin)
+admin.site.register(models.PrimaryAccount, PrimaryAccountAdmin)

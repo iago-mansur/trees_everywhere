@@ -39,7 +39,16 @@ class User(AbstractBaseUser, PermissionsMixin):
     name = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    primary_account = models.ForeignKey('PrimaryAccount', related_name='account_users', on_delete=models.SET_NULL, null=True, blank=True)
 
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
+
+
+class PrimaryAccount(models.Model):
+    """Account to aggregate users"""
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name

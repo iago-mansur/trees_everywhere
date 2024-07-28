@@ -8,10 +8,13 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 from rest_framework import status
 
+from core.models import PrimaryAccount
+
 
 CREATE_USER_URL = reverse('user:create')
 TOKEN_URL = reverse('user:token')
 ME_URL = reverse('user:me')
+ACCOUNT_USERS_URL = lambda account_id: reverse('user:account-users', args=[account_id])
 
 
 def create_user(**params):
@@ -137,6 +140,7 @@ class PrivateUserApiTests(TestCase):
         self.assertEqual(res.data, {
             'name': self.user.name,
             'email': self.user.email,
+            'primary_account': None,
         })
 
     def test_post_me_not_allowed(self):
@@ -155,3 +159,61 @@ class PrivateUserApiTests(TestCase):
         self.assertEqual(self.user.name, payload['name'])
         self.assertTrue(self.user.check_password(payload['password']))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_retrieve_users_by_account(self):
+        """Test retrieving users for a primary account."""
+        primary_account = PrimaryAccount.objects.create(name='Test Account')
+        user1 = create_user(
+            email='user1@example.com',
+            password='testpass123',
+            name='User One',
+            primary_account=primary_account
+        )
+        user2 = create_user(
+            email='user2@example.com',
+            password='testpass123',
+            name='User Two',
+            primary_account=primary_account
+        )
+        url = ACCOUNT_USERS_URL(primary_account.id)
+        res = self.client.get(url)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 2)
+        self.assertEqual(res.data[0]['name'], user1.name)
+        self.assertEqual(res.data[1]['name'], user2.name)
+
+    def test_retrieve_users_by_account_unauthorized(self):
+        """Test that authentication is required for retrieving users by account."""
+        primary_account = PrimaryAccount.objects.create(name='Test Account')
+        create_user(
+            email='user1@example.com',
+            password='testpass123',
+            name='User One',
+            primary_account=primary_account
+        )
+        url = ACCOUNT_USERS_URL(primary_account.id)
+        self.client.logout()
+        res = self.client.get(url)
+
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_retrieve_users_by_nonexistent_account(self):
+        """Test retrieving users for a non-existent primary account returns an empty list."""
+        url = ACCOUNT_USERS_URL(999)
+        res = self.client.get(url)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 0)
+
+    def test_create_user_invalid_email(self):
+        """Test that creating a user with an invalid email format returns an error."""
+        payload = {
+            'email': 'invalid-email',
+            'password': 'testpass123',
+            'name': 'Test Name',
+        }
+        res = self.client.post(CREATE_USER_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('email', res.data)

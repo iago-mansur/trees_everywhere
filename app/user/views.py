@@ -10,6 +10,10 @@ from user.serializers import (
     AuthTokenSerializer,
 )
 
+from core.models import User
+from .permissions import IsAuthenticatedOr401
+
+
 
 class CreateUserView(generics.CreateAPIView):
     """Create a new user in the system."""
@@ -31,3 +35,15 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         """Retrieve and return the authenticated user."""
         return self.request.user
+
+
+class ListUsersByAccountView(generics.ListAPIView):
+    """List users by primary account."""
+    serializer_class = UserSerializer
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [IsAuthenticatedOr401]
+
+    def get_queryset(self):
+        """Retrieve users for the specified primary account."""
+        account_id = self.kwargs['account_id']
+        return User.objects.filter(primary_account_id=account_id)
