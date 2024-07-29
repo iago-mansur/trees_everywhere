@@ -48,18 +48,21 @@ class ModelTests(TestCase):
         self.assertTrue(user.is_superuser)
         self.assertTrue(user.is_staff)
 
-    def test_user_primary_account_association(self):
-        """Test creating a user associates it with a primary account."""
+    def test_user_primary_accounts_association(self):
+        """Test creating a user associates it with a primary accounts."""
         email = 'test@example.com'
         password = 'testpass123'
-        account_name = 'Primary Account'
+        account_names = ['Primary Account 1', 'Primary Account 2']
 
-        primary_account = PrimaryAccount.objects.create(name=account_name)
+        primary_accounts = [PrimaryAccount.objects.create(name=name) for name in account_names]
+
         user = get_user_model().objects.create_user(
             email=email,
-            password=password,
-            primary_account=primary_account
+            password=password
         )
+        user.primary_accounts.set(primary_accounts)
 
-        self.assertEqual(user.primary_account.name, account_name)
-        self.assertEqual(primary_account.account_users.first(), user)
+        user.refresh_from_db()
+
+        associated_accounts = user.primary_accounts.all()
+        self.assertEqual(set(account_names), set(account.name for account in associated_accounts))

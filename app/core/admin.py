@@ -11,7 +11,7 @@ from core import models
 class UserAdmin(BaseUserAdmin):
     """Define the admin pages for users."""
     ordering = ['id']
-    list_display = ['email', 'name', 'primary_account']
+    list_display = ['email', 'name', 'get_primary_accounts']
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         (
@@ -19,7 +19,7 @@ class UserAdmin(BaseUserAdmin):
             {
                 'fields': (
                     'name',
-                    'primary_account',  # Added 'primary_account'
+                    'primary_accounts',
                 ),
             }
         ),
@@ -44,13 +44,17 @@ class UserAdmin(BaseUserAdmin):
                 'password1',
                 'password2',
                 'name',
-                'primary_account',
+                'primary_accounts',
                 'is_active',
                 'is_staff',
                 'is_superuser',
             )
         }),
     )
+
+    def get_primary_accounts(self, obj):
+        return ", ".join([account.name for account in obj.primary_accounts.all()])
+    get_primary_accounts.short_description = 'Primary Accounts'
 
 
 class PrimaryAccountAdmin(admin.ModelAdmin):

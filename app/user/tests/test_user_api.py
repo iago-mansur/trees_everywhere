@@ -19,7 +19,11 @@ ACCOUNT_USERS_URL = lambda account_id: reverse('user:account-users', args=[accou
 
 def create_user(**params):
     """Create and return a new user."""
-    return get_user_model().objects.create_user(**params)
+    primary_accounts = params.pop('primary_accounts', [])
+    user = get_user_model().objects.create_user(**params)
+    if primary_accounts:
+        user.primary_accounts.set(primary_accounts)
+    return user
 
 
 class PublicUserApiTests(TestCase):
@@ -34,6 +38,7 @@ class PublicUserApiTests(TestCase):
             'email': 'test@example.com',
             'password': 'testpass123',
             'name': 'Test Name',
+            'primary_accounts': 'Account 1'
         }
         res = self.client.post(CREATE_USER_URL, payload)
 
@@ -48,6 +53,7 @@ class PublicUserApiTests(TestCase):
             'email': 'test@example.com',
             'password': 'testpass123',
             'name': 'Test Name',
+            'primary_accounts': 'Account 1'
         }
         create_user(**payload)
         res = self.client.post(CREATE_USER_URL, payload)
@@ -60,6 +66,7 @@ class PublicUserApiTests(TestCase):
             'email': 'test@example.com',
             'password': 'pw',
             'name': 'Test name',
+            'primary_accounts': 'Account 1'
         }
         res = self.client.post(CREATE_USER_URL, payload)
 
@@ -128,6 +135,7 @@ class PrivateUserApiTests(TestCase):
             email='test@example.com',
             password='testpass123',
             name='Test Name',
+            primary_accounts='Account 1'
         )
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
@@ -140,7 +148,7 @@ class PrivateUserApiTests(TestCase):
         self.assertEqual(res.data, {
             'name': self.user.name,
             'email': self.user.email,
-            'primary_account': None,
+            'primary_accounts': self.user.primary_accounts,
         })
 
     def test_post_me_not_allowed(self):
@@ -166,15 +174,17 @@ class PrivateUserApiTests(TestCase):
         user1 = create_user(
             email='user1@example.com',
             password='testpass123',
-            name='User One',
-            primary_account=primary_account
+            name='User One'
         )
         user2 = create_user(
             email='user2@example.com',
             password='testpass123',
-            name='User Two',
-            primary_account=primary_account
+            name='User Two'
         )
+
+        user1.primary_accounts.add(primary_account)
+        user2.primary_accounts.add(primary_account)
+
         url = ACCOUNT_USERS_URL(primary_account.id)
         res = self.client.get(url)
 
@@ -190,7 +200,7 @@ class PrivateUserApiTests(TestCase):
             email='user1@example.com',
             password='testpass123',
             name='User One',
-            primary_account=primary_account
+            primary_accounts=[primary_account]
         )
         url = ACCOUNT_USERS_URL(primary_account.id)
         self.client.logout()

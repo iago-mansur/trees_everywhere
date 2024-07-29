@@ -46,4 +46,4 @@ class ListUsersByAccountView(generics.ListAPIView):
     def get_queryset(self):
         """Retrieve users for the specified primary account."""
         account_id = self.kwargs['account_id']
-        return User.objects.filter(primary_account_id=account_id)
+        return User.objects.filter(primary_accounts__id=account_id)

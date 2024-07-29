@@ -71,8 +71,8 @@ class AdminSiteTests(TestCase):
         self.assertEqual(res.status_code, 200)
 
     def test_edit_user_page_contains_primary_account(self):
-        """Test the edit user page contains the primary account field."""
+        """Test the edit user page contains the primary accounts field."""
         url = reverse('admin:core_user_change', args=[self.user.id])
         res = self.client.get(url)
 
-        self.assertContains(res, 'Primary account')
+        self.assertContains(res, 'Primary accounts')
