@@ -61,8 +61,17 @@ class ModelTests(TestCase):
             password=password
         )
         user.primary_accounts.set(primary_accounts)
-
         user.refresh_from_db()
 
         associated_accounts = user.primary_accounts.all()
         self.assertEqual(set(account_names), set(account.name for account in associated_accounts))
+
+    def test_user_created_field(self):
+        """Test that the created field is set correctly when a user is created."""
+        email = 'test@example.com'
+        password = 'testpass123'
+        user = get_user_model().objects.create_user(
+            email=email,
+            password=password
+        )
+        self.assertIsNotNone(user.created)

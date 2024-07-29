@@ -11,7 +11,7 @@ from core import models
 class UserAdmin(BaseUserAdmin):
     """Define the admin pages for users."""
     ordering = ['id']
-    list_display = ['email', 'name', 'get_primary_accounts']
+    list_display = ['email', 'name', 'get_primary_accounts', 'created']
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         (
@@ -33,9 +33,9 @@ class UserAdmin(BaseUserAdmin):
                 ),
             }
         ),
-        (_('Important dates'), {'fields': ('last_login',)}),
+        (_('Important dates'), {'fields': ('last_login', 'created')}),
     )
-    readonly_fields = ['last_login']
+    readonly_fields = ['last_login', 'created']
     add_fieldsets = (
         (None, {
             'classes': ('wide',),

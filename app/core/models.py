@@ -16,6 +16,7 @@ class UserManager(BaseUserManager):
         """Create, save and return a new user."""
         if not email:
             raise ValueError('The Email field must be set')
+
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
@@ -25,6 +26,7 @@ class UserManager(BaseUserManager):
 
     def create_superuser(self, email, password):
         """Create and return a new superuser."""
+
         user = self.create_user(email, password)
         user.is_staff = True
         user.is_superuser = True
@@ -64,10 +66,15 @@ class User(AbstractBaseUser, PermissionsMixin):
         help_text='The primary accounts associated with this user.'
     )
 
+    created = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='date created',
+        help_text='The date and time when the user was created.'
+    )
+
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['name']
 
     def __str__(self):
         return self.email
