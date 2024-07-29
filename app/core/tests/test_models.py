@@ -3,7 +3,7 @@ Tests for models.
 """
 from django.test import TestCase
 from django.contrib.auth import get_user_model
-from core.models import PrimaryAccount
+from core.models import Account
 
 class ModelTests(TestCase):
     """Test models."""
@@ -48,22 +48,22 @@ class ModelTests(TestCase):
         self.assertTrue(user.is_superuser)
         self.assertTrue(user.is_staff)
 
-    def test_user_primary_accounts_association(self):
-        """Test creating a user associates it with a primary accounts."""
+    def test_user_accounts_association(self):
+        """Test creating a user associates it with accounts."""
         email = 'test@example.com'
         password = 'testpass123'
-        account_names = ['Primary Account 1', 'Primary Account 2']
+        account_names = ['Account 1', 'Account 2']
 
-        primary_accounts = [PrimaryAccount.objects.create(name=name) for name in account_names]
+        accounts = [Account.objects.create(name=name) for name in account_names]
 
         user = get_user_model().objects.create_user(
             email=email,
             password=password
         )
-        user.primary_accounts.set(primary_accounts)
+        user.accounts.set(accounts)
         user.refresh_from_db()
 
-        associated_accounts = user.primary_accounts.all()
+        associated_accounts = user.accounts.all()
         self.assertEqual(set(account_names), set(account.name for account in associated_accounts))
 
     def test_user_created_field(self):

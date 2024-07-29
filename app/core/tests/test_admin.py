@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.test import Client
 
-from core.models import PrimaryAccount
+from core.models import Account
 
 
 class AdminSiteTests(TestCase):
@@ -25,7 +25,9 @@ class AdminSiteTests(TestCase):
             password='testpass123',
             name='Test User'
         )
-        self.primary_account = PrimaryAccount.objects.create(name='Test Account')
+        self.accounts = [Account.objects.create(name=f'Account {i}') for i in range(3)]
+        self.user.accounts.set(self.accounts)
+        self.user.refresh_from_db()
 
     def test_users_list(self):
         """Test that users are listed on page."""
@@ -49,30 +51,31 @@ class AdminSiteTests(TestCase):
 
         self.assertEqual(res.status_code,200)
 
-    def test_primary_accounts_list(self):
-        """Test that primary accounts are listed on page."""
-        url = reverse('admin:core_primaryaccount_changelist')
+    def test_accounts_list(self):
+        """Test that accounts are listed on page."""
+        url = reverse('admin:core_account_changelist')
         res = self.client.get(url)
 
-        self.assertContains(res, self.primary_account.name)
+        for account in self.accounts:
+            self.assertContains(res, account.name)
 
-    def test_edit_primary_account_page(self):
-        """Test the edit primary account page works."""
-        url = reverse('admin:core_primaryaccount_change', args=[self.primary_account.id])
-        res = self.client.get(url)
-
-        self.assertEqual(res.status_code, 200)
-
-    def test_create_primary_account_page(self):
-        """Test the create primary account page works."""
-        url = reverse('admin:core_primaryaccount_add')
+    def test_edit_account_page(self):
+        """Test the edit account page works."""
+        url = reverse('admin:core_account_change', args=[self.accounts[0].id])
         res = self.client.get(url)
 
         self.assertEqual(res.status_code, 200)
 
-    def test_edit_user_page_contains_primary_account(self):
-        """Test the edit user page contains the primary accounts field."""
+    def test_create_account_page(self):
+        """Test the create account page works."""
+        url = reverse('admin:core_account_add')
+        res = self.client.get(url)
+
+        self.assertEqual(res.status_code, 200)
+
+    def test_edit_user_page_contains_account(self):
+        """Test the edit user page contains the accounts field."""
         url = reverse('admin:core_user_change', args=[self.user.id])
         res = self.client.get(url)
 
-        self.assertContains(res, 'Primary accounts')
+        self.assertContains(res, 'Accounts')

@@ -58,12 +58,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name='staff status',
         help_text='Designates whether the user can log into this admin site.'
     )
-    primary_accounts = models.ManyToManyField(
-        'PrimaryAccount',
+    accounts = models.ManyToManyField(
+        'Account',
         related_name='account_users',
         blank=True,
-        verbose_name='primary accounts',
-        help_text='The primary accounts associated with this user.'
+        verbose_name='accounts',
+        help_text='The accounts associated with this user.'
     )
 
     created = models.DateTimeField(
@@ -80,12 +80,24 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.email
 
 
-class PrimaryAccount(models.Model):
+class Account(models.Model):
     """Account to aggregate users"""
     name = models.CharField(
         max_length=255,
         verbose_name='account name',
         help_text='Required. 255 characters or fewer.'
+    )
+
+    created = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='date created',
+        help_text='The date and time when the user was created.'
+    )
+
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name='active status',
+        help_text='Designates whether this account should be treated as active. Unselect this instead of deleting accounts.'
     )
 
     def __str__(self):

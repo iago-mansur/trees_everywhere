@@ -11,7 +11,7 @@ from core import models
 class UserAdmin(BaseUserAdmin):
     """Define the admin pages for users."""
     ordering = ['id']
-    list_display = ['email', 'name', 'get_primary_accounts', 'created']
+    list_display = ['email', 'name', 'get_accounts', 'created']
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         (
@@ -19,7 +19,7 @@ class UserAdmin(BaseUserAdmin):
             {
                 'fields': (
                     'name',
-                    'primary_accounts',
+                    'accounts',
                 ),
             }
         ),
@@ -44,7 +44,7 @@ class UserAdmin(BaseUserAdmin):
                 'password1',
                 'password2',
                 'name',
-                'primary_accounts',
+                'accounts',
                 'is_active',
                 'is_staff',
                 'is_superuser',
@@ -52,15 +52,22 @@ class UserAdmin(BaseUserAdmin):
         }),
     )
 
-    def get_primary_accounts(self, obj):
-        return ", ".join([account.name for account in obj.primary_accounts.all()])
-    get_primary_accounts.short_description = 'Primary Accounts'
+    def get_accounts(self, obj):
+        return ", ".join([account.name for account in obj.accounts.all()])
+    get_accounts.short_description = 'Accounts'
 
 
-class PrimaryAccountAdmin(admin.ModelAdmin):
-    """Define the admin pages for primary accounts."""
-    list_display = ['name']
+class AccountAdmin(admin.ModelAdmin):
+    """Define the admin pages for accounts."""
+    ordering = ['id']
+    list_display = ['name', 'is_active', 'created']
+    list_filter = ['is_active']
     search_fields = ['name']
+    fieldsets = (
+        (None, {'fields': ('name', 'is_active')}),
+        (_('Important dates'), {'fields': ('created',)}),
+    )
+    readonly_fields = ['created']
 
 admin.site.register(models.User, UserAdmin)
-admin.site.register(models.PrimaryAccount, PrimaryAccountAdmin)
+admin.site.register(models.Account, AccountAdmin)
