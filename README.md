@@ -4,7 +4,7 @@ The "Trees Everywhere" project aims to create a database of trees planted by vol
 
 ## Instructions to run the app
 
-- [Install Docker and Docker Compose] (https://docs.docker.com/compose/install/)
+- [Install Docker and Docker Compose](https://docs.docker.com/compose/install/)
 - On terminal
     - sudo chmod 666 /var/run/docker.sock
     - docker build .
