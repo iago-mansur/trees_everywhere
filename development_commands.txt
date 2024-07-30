@@ -82,6 +82,20 @@ Web Browser:
             }
         GET
 
+docker-compose run --rm app sh -c "python manage.py test"
+docker-compose run --rm app sh -c "python manage.py makemigrations"
+docker-compose run --rm app sh -c "python manage.py test"
+docker-compose run --rm app sh -c "django-admin startapp tree"
+docker-compose run --rm app sh -c "python manage.py test"
+docker-compose run --rm app sh -c "python manage.py migrate"
+docker-compose up
+
+    {
+            "email": "user2@example.com",
+            "password": "Teste123456",
+            "name": "User Two"
+        }
+
 
 
 

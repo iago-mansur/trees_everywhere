@@ -1,9 +1,12 @@
 """
 Tests for models.
 """
+from decimal import Decimal
+
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 
+from core import models
 
 class ModelTests(TestCase):
     """Test models."""
@@ -47,3 +50,18 @@ class ModelTests(TestCase):
 
         self.assertTrue(user.is_superuser)
         self.assertTrue(user.is_staff)
+
+    def test_create_tree(self):
+        """Test creating a tree is successful."""
+        user = get_user_model().objects.create_user(
+            'test@example.com',
+            'testpass123',
+        )
+        tree = models.Tree.objects.create(
+            user=user,
+            description='Sample tree description.',
+            latitude=Decimal('10.123456'),
+            longitude=Decimal('20.123456')
+        )
+
+        self.assertEqual(str(tree), 'Tree at (latitude and longitude): (10.123456, 20.123456)')
