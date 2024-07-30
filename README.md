@@ -9,4 +9,5 @@ The "Trees Everywhere" project aims to create a database of trees planted by vol
     - sudo chmod 666 /var/run/docker.sock
     - docker build .
     - docker-compose build
-    -  docker-compose up
+    - docker-compose run --rm app sh -c "python manage.py migrate"
+    - docker-compose up
